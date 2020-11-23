@@ -31,7 +31,7 @@ function handleJoinGame(io, client, roomName) {
 
   client.join(roomName);
   client.number = player.no;
-  client.emit('init', { game, player });
+  client.emit('initGame', { game, player });
 }
 
 function handleNewGame(io, client) {
@@ -46,7 +46,7 @@ function handleNewGame(io, client) {
 
   client.join(roomName);
   client.number = player.no;
-  client.emit('init', { game, player });
+  client.emit('initGame', { game, player });
 }
 
       
