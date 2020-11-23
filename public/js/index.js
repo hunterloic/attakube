@@ -1,6 +1,7 @@
-
 const newGameBtn = document.getElementById('newGameButton');
 const joinGameBtn = document.getElementById('joinGameButton');
+const gameCodeInput = document.getElementById('gameCodeInput');
+const nameInput = document.getElementById('nameInput');
 
 newGameBtn.addEventListener('click', newGame);
 joinGameBtn.addEventListener('click', joinGame);
@@ -11,18 +12,24 @@ let gameActive = false;
 
 const socket = io();
 
+socket.on('gameCode', handleGameCode);
+socket.on('unknownCode', handleUnknownCode);
+socket.on('tooManyPlayers', handleTooManyPlayers);
+socket.on('init', handleInit);
+socket.on('gameStart', handleGameStart);
+
 function newGame() {
   socket.emit('newGame');
-  init();
 }
 
 function joinGame() {
   const code = gameCodeInput.value;
   socket.emit('joinGame', code);
-  init();
 }
 
-function init() {
+function handleInit({ game, player }) {
+  alert(JSON.stringify(game));
+
   initialScreen.style.display = "none";
   gameScreen.style.display = "block";
 
@@ -41,7 +48,18 @@ function init() {
   gameActive = true;
 }
 
+function handleGameCode(gameCode) {
+  alert(gameCode);
+}
 
-socket.on("message", (message) => {
-  alert("message:" + message);
-});
+function handleUnknownCode() {
+  alert('Unknown Game Code')
+}
+
+function handleTooManyPlayers() {
+  alert('This game is full');
+}
+
+function handleGameStart() {
+  alert('game start!');
+}
