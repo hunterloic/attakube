@@ -1,5 +1,5 @@
 const socket = require("socket.io");
-const { Game } = require('../game2/game');
+const { Game } = require('../game/game');
 const { GameService } = require('../service/game');
 const { makeid } = require('../utils/common');
 

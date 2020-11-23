@@ -1,8 +1,8 @@
-const { Game } = require("../game2/game");
-const { Player } = require("../game2/player");
+const { Game } = require("../game/game");
+const { Player } = require("../game/player");
 const {
     PLAYER_STATUS_JOIN
-} = require("../game2/player");
+} = require("../game/player");
 
 
 class GameService {

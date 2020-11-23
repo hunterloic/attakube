@@ -1,9 +1,3 @@
-const {
-    PLAYER_STATUS_NOT_PRESENT,
-    PLAYER_STATUS_JOIN,
-    PLAYER_STATUS_READY,
-} = require('./player');
-
 const KUBE_TYPE_STAR = 1;
 const KUBE_TYPE_COMET = 2;
 const KUBE_TYPE_EARTHQUAKE = 3;
@@ -21,6 +15,32 @@ const KUBE_STATE_SHOWN = 2;
 const KUBE_STATE_HIDDEN = 1;
 const KUBE_STATE_SHOWN = 2;
 
+class Kube {
+    x;
+    y;
+    player;
+    kubeType;
+    state;
+    alter;
+
+    constructor(x, y, player, kubeType) {
+        let cell = {
+            x,
+            y,
+            player,
+            kube : {
+            }
+        };
+        
+        this.x = kubeType;
+        this.y = kubeType;
+        this.player = player;
+        this.type = kubeType;
+        this.state = KUBE_STATE_HIDDEN;
+        this.alter = KUBE_ALTER_NONE;
+    }
+}
+
 module.exports = {
     KUBE_TYPE_STAR,
     KUBE_TYPE_COMET,
@@ -32,21 +52,13 @@ module.exports = {
     KUBE_TYPE_SHIELD,
     KUBE_TYPE_KEY,
     KUBE_TYPE_EYE,
+
+    KUBE_STATE_HIDDEN,
+    KUBE_STATE_SHOWN,
+
+    KUBE_STATE_HIDDEN,
+    KUBE_STATE_SHOWN,
     
-    createKube,
+    Kube,
 }
 
-function createKube(x, y, player, kubeType) {
-    let cell = {
-        x,
-        y,
-        player,
-        kube : {
-            type: kubeType,
-            state: KUBE_STATE_HIDDEN,
-            alter: KUBE_ALTER_NONE
-        }
-    };
-
-    return cell;
-}
