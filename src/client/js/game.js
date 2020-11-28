@@ -1,4 +1,5 @@
 import * as THREE from '/build/three.module.js';
+import { OrbitControls } from '/jsm/controls/OrbitControls.js';
 
 export {
     init
@@ -7,11 +8,12 @@ export {
 const BOARD_SIZE_SIZE = 500;
 const BOARD_SIZE_HEIGHT = 10;
 
-const KUBE_SIZE = 35;
+const KUBE_SIZE = 50;
 
 let scene;
 let camera;
 let renderer;
+let controls;
 
 function init() {
   
@@ -24,12 +26,19 @@ function init() {
 
     initKube();
 
+    initOrbitControl();
     render();
   
 }
 
+function initOrbitControl() {
+
+    controls = new OrbitControls(camera, renderer.domElement)
+}
+
 function render() {
     // Render
+    controls.update();
     requestAnimationFrame(render);
     renderer.render(scene, camera);
 }
@@ -102,7 +111,7 @@ function initKube() {
     ];
     material = new THREE.MeshFaceMaterial(cubeMaterial);
     mesh = new THREE.Mesh(geometry, material);
-    mesh.position.y = 12;
+    mesh.position.y = 28;
     scene.add(mesh);
 
 }

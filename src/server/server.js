@@ -17,7 +17,7 @@ require('./startup/logging');
 app.use(error);
 app.use(express.static(`${__dirname}/../client`));
 app.use('/build/', express.static(path.join(__dirname, '../../node_modules/three/build')));
-app.use('/jsm/', express.static(path.join(__dirname, '../../node_modules/three/example/jsm')));
+app.use('/jsm/', express.static(path.join(__dirname, '../../node_modules/three/examples/jsm')));
 
 const server = http.createServer(app);
 
