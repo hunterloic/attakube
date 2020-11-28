@@ -1,4 +1,5 @@
 require("dotenv").config();
+const path = require("path");
 const express = require("express");
 const http = require('http');
 const socket = require("socket.io");
@@ -15,6 +16,8 @@ require('./startup/logging');
 
 app.use(error);
 app.use(express.static(`${__dirname}/../client`));
+app.use('/build/', express.static(path.join(__dirname, '../../node_modules/three/build')));
+app.use('/jsm/', express.static(path.join(__dirname, '../../node_modules/three/example/jsm')));
 
 const server = http.createServer(app);
 
