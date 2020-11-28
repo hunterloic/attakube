@@ -34,13 +34,14 @@ let scene;
 let camera;
 let renderer;
 let controls;
+let $viewCube;
 
 function init() {
   
     scene = new THREE.Scene();
 
-    const kubeSelectionHeight = window.innerHeight / 10;
-    const boardHeight = window.innerHeight - kubeSelectionHeight;
+    let kubeSelectionHeight = window.innerHeight / 7;
+    let boardHeight = window.innerHeight - kubeSelectionHeight;
 
     initRenderer(boardHeight);
     initCamera(boardHeight);
@@ -58,10 +59,25 @@ function init() {
 
     // document.addEventListener("click", handleClick);
     // $(document.body).append($('<div>hello</div>'))
-    let $viewCube = $('.view-cube');
+    $viewCube = $('.view-cube');
+    $viewCube.height(kubeSelectionHeight);
+    $viewCube.width(window.innerWidth);
     $viewCube.css('top', window.innerHeight - $viewCube.height());
+    
+    window.addEventListener('resize', () => {
+        
+        kubeSelectionHeight = window.innerHeight / 7;
+        boardHeight = window.innerHeight - kubeSelectionHeight;
 
-  $viewCube.append('<div>test</div>')
+        $viewCube.height(kubeSelectionHeight);
+        $viewCube.width(window.innerWidth);
+        $viewCube.css('top', window.innerHeight - $viewCube.height());
+
+        renderer.setSize(window.innerWidth,boardHeight);
+        camera.aspect = window.innerWidth / boardHeight;
+        camera.updateProjectionMatrix();
+    })
+
 }
 
 // function handleClick(e) {
@@ -97,11 +113,6 @@ function initCamera(boardHeight) {
     camera = new THREE.PerspectiveCamera(75,window.innerWidth/boardHeight,0.1,2000)
     camera.position.z = 600;
     camera.position.y = 550;
-    window.addEventListener('resize', () => {
-        renderer.setSize(window.innerWidth,boardHeight);
-        camera.aspect = window.innerWidth / boardHeight;
-        camera.updateProjectionMatrix();
-    })
 }
 
 function initLight() {
