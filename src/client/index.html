@@ -24,19 +24,66 @@
       padding: .2em;
     }
 
-    .view-cube{
+    #kube-selector{
       position: absolute;
       font-style:bold;
       font-size:25px;
       background-color:red;
     }
+
+    #kube-slider .kube-image{
+    }
+
+    /* .kube-container{
+    } */
   </style>
 </head>
 <body>
+  <link type="text/css" rel="stylesheet" href="./css/lightslider.css" />                  
   <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
   <script type="module" src="./js/main.js"></script>
-  <div class="view-cube">
-    hello
+  <script src="./js/lightslider.min.js"></script>
+  <div id="kube-selector">
+    <ul id="kube-slider">
+      <li>
+        <div class="kube-container">
+          <div class="kube-image">
+            <img src="./img/kube_star.png" />
+          </div>
+        </div>
+      </li>
+      <li>
+        <div class="kube-container">
+          <div class="kube-image">
+            <img src="./img/kube_star.png" />
+          </div>
+        </div>
+      </li>
+      <li>
+        
+        <div class="kube-container">
+          <div class="kube-image">
+            <img src="./img/kube_star.png" />
+          </div>
+        </div>
+      </li>
+      <li>
+        
+        <div class="kube-container">
+          <div class="kube-image">
+            <img src="./img/kube_star.png" />
+          </div>
+        </div>
+      </li>
+      <li>
+        
+        <div class="kube-container">
+          <div class="kube-image">
+            <img src="./img/kube_star.png" />
+          </div>
+        </div>
+      </li>
+    </ul>
   </div>
 </body>
 </html>

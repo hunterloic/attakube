@@ -40,53 +40,64 @@ function init() {
   
     scene = new THREE.Scene();
 
-    let kubeSelectionHeight = window.innerHeight / 7;
-    let boardHeight = window.innerHeight - kubeSelectionHeight;
+    const { kubeSelectionHeight, boardHeight } = { ...getSizes() };
 
-    initRenderer(boardHeight);
-    initCamera(boardHeight);
+    initRenderer();
+    initCamera();
     initLight();
     initBoard();
 
-    // for(let i = 1; i<8; i++)
-    //     for(let j = 1; j<8; j++)
-    //     initKube(KUBE_TYPE.STAR, i, j, 1);
-    
     initKube(KUBE_TYPE.STAR, 1, 1, 1);
 
     initOrbitControl();
     render();
 
-    // document.addEventListener("click", handleClick);
-    // $(document.body).append($('<div>hello</div>'))
-    $viewCube = $('.view-cube');
-    $viewCube.height(kubeSelectionHeight);
-    $viewCube.width(window.innerWidth);
-    $viewCube.css('top', window.innerHeight - $viewCube.height());
-    
+    setElementSize();
+
+    $('#kube-slider').lightSlider(
+        {
+            pager:false,
+            item:4,
+            slideMargin: 0
+        }
+    );
+
     window.addEventListener('resize', () => {
-        
-        kubeSelectionHeight = window.innerHeight / 7;
-        boardHeight = window.innerHeight - kubeSelectionHeight;
-
-        $viewCube.height(kubeSelectionHeight);
-        $viewCube.width(window.innerWidth);
-        $viewCube.css('top', window.innerHeight - $viewCube.height());
-
-        renderer.setSize(window.innerWidth,boardHeight);
-        camera.aspect = window.innerWidth / boardHeight;
-        camera.updateProjectionMatrix();
+        setElementSize();
     })
 
 }
 
-// function handleClick(e) {
-//     var relativeX = (e.pageX - $(e.target).offset().left),
-//         relativeY = (e.pageY - $(e.target).offset().top);
+function getSizes() {
+    const kubeSelectionHeight = window.innerHeight / 7;
+    const boardHeight = window.innerHeight - kubeSelectionHeight;
 
-//         alert("X: " + relativeX + "  Y: " + relativeY);
+    return {
+        kubeSelectionHeight,
+        boardHeight
+    }
+}
 
-// }
+function setElementSize() {
+
+    const { kubeSelectionHeight, boardHeight } = { ...getSizes() };
+
+    let $kubeSelector = $("#kube-selector");
+    $kubeSelector.height(kubeSelectionHeight);
+    $kubeSelector.width(window.innerWidth / 2);
+    $kubeSelector.css('top', window.innerHeight - $kubeSelector.height());
+
+    let $kubeContainer = $(".kube-container");
+    $kubeContainer.height(kubeSelectionHeight);
+    
+    let $kubeImage = $(".kube-container img");
+    $kubeImage.width(kubeSelectionHeight);
+    $kubeImage.height(kubeSelectionHeight);
+
+    renderer.setSize(window.innerWidth,boardHeight);
+    camera.aspect = window.innerWidth / boardHeight;
+    camera.updateProjectionMatrix();
+}
 
 function initOrbitControl() {
 
@@ -100,7 +111,9 @@ function render() {
     renderer.render(scene, camera);
 }
 
-function initRenderer(boardHeight) {
+function initRenderer() {
+    const { boardHeight } = { ...getSizes() };
+
     // Renderer
     renderer = new THREE.WebGLRenderer({antialias: true});
     renderer.setClearColor("#afe1fa");
@@ -108,7 +121,9 @@ function initRenderer(boardHeight) {
     document.body.appendChild(renderer.domElement);
 }
 
-function initCamera(boardHeight) {
+function initCamera() {
+    const { boardHeight } = { ...getSizes() };
+
     // Camera
     camera = new THREE.PerspectiveCamera(75,window.innerWidth/boardHeight,0.1,2000)
     camera.position.z = 600;
@@ -143,26 +158,30 @@ function initLight() {
     const light5 = new THREE.PointLight(0xFFFFFF, 1, 0)
     light5.position.set(x,100,-z);
     scene.add(light5);
+
+    // light
+    const light6 = new THREE.PointLight(0xFFFFFF, 1, 0)
+    light6.position.set(0,-z,0);
+    scene.add(light6);
 }
 
 function initBoard() {
     // Board
     let geometry;
     let mesh;
-    let material;
     let cubeMaterial;
   
     geometry = new THREE.BoxGeometry(BOARD_SIZE_SIZE, BOARD_SIZE_HEIGHT , BOARD_SIZE_SIZE);
     cubeMaterial = [
-      new THREE.MeshLambertMaterial({color: 0x1c5c31}), // right
-      new THREE.MeshLambertMaterial({color: 0x1c5c31}), // left
+      new THREE.MeshLambertMaterial({color: 0x13104f}), // right
+      new THREE.MeshLambertMaterial({color: 0x13104f}), // left
       new THREE.MeshBasicMaterial( { map: new THREE.TextureLoader().load('/img/board.png'), side: THREE.DoubleSide }), // top
-      new THREE.MeshLambertMaterial({color: 0x1c5c31}), // bottom
-      new THREE.MeshLambertMaterial({color: 0x1c5c31}), // front
-      new THREE.MeshLambertMaterial({color: 0x1c5c31}) // back
+      new THREE.MeshLambertMaterial({color: 0x13104f}), // bottom
+      new THREE.MeshLambertMaterial({color: 0x13104f}), // front
+      new THREE.MeshLambertMaterial({color: 0x13104f}) // back
     ];
-    material = new THREE.MeshFaceMaterial(cubeMaterial);
-    mesh = new THREE.Mesh(geometry, material);
+
+    mesh = new THREE.Mesh(geometry, cubeMaterial);
     scene.add(mesh);
     camera.lookAt(mesh.position.x, mesh.position.y, mesh.position.z);
 }
@@ -171,7 +190,6 @@ function initKube(kubeType, x, y, player) {
     // Board
     let geometry;
     let mesh;
-    let material;
     let cubeMaterial;
     let kubeImage;
     let kubeColor;
@@ -204,11 +222,9 @@ function initKube(kubeType, x, y, player) {
       new THREE.MeshLambertMaterial({color: kubeColor}) // back
     ];
 
-    material = new THREE.MeshFaceMaterial(cubeMaterial);
-
     y = 8 - y;
 
-    mesh = new THREE.Mesh(geometry, material);
+    mesh = new THREE.Mesh(geometry, cubeMaterial);
     mesh.position.y = KUBE_ONBOARD_Y_POSITION;
     mesh.position.x = ((BOARD_SIZE_SIZE / 2) * -1) + (x * 100) - 50;
     mesh.position.z = ((BOARD_SIZE_SIZE / 2) * -1) + (y * 100) - 50;
