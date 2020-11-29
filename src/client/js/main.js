@@ -1,4 +1,4 @@
 
 import { init } from './game.js';
 
-init();
+init(1);

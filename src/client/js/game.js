@@ -30,17 +30,63 @@ const KUBE_TYPE = {
     EYE : 10,
 }
 
+const KUBE_STATE = {
+    HIDDEN:1,
+    SHOWN:1,
+};
+
+const KUBE_ALTER = {
+    NONE:1,
+    FIRE:2,
+    ECLIPSE:3,
+};
+
 let scene;
 let camera;
 let renderer;
 let controls;
-let $viewCube;
 
-function init() {
+let selectableKubes = new Array();
+let boardKubes = new Array();
+let currentPlayer;
+
+// board kube example
+let boardKube = {
+    player: 1,
+    x:1,
+    y:1,
+    type: KUBE_TYPE.STAR,
+    state: KUBE_STATE.HIDDEN,
+    alter: KUBE_ALTER.NONE
+}
+
+function init(player) {
   
+    currentPlayer = player;
+
+    selectableKubes = [
+        KUBE_TYPE.STAR,
+        KUBE_TYPE.STAR,
+        KUBE_TYPE.COMET,
+        KUBE_TYPE.EARTHQUAKE,
+        KUBE_TYPE.TSUNAMI,
+        KUBE_TYPE.TORNADO,
+        KUBE_TYPE.FIRE,
+        KUBE_TYPE.ECLIPSE,
+        KUBE_TYPE.SHIELD,
+        KUBE_TYPE.KEY,
+        KUBE_TYPE.KEY,
+        KUBE_TYPE.EYE
+    ];
+
     scene = new THREE.Scene();
 
-    const { kubeSelectionHeight, boardHeight } = { ...getSizes() };
+    const { 
+        kubeSelectionHeight, 
+        kubeSelectionPadding, 
+        kubeImageHeight, 
+        boardHeight 
+    } = { ...getSizes() };
 
     initRenderer();
     initCamera();
@@ -54,49 +100,138 @@ function init() {
 
     setElementSize();
 
-    $('#kube-slider').lightSlider(
-        {
-            pager:false,
-            item:4,
-            slideMargin: 0
-        }
-    );
-
     window.addEventListener('resize', () => {
-        setElementSize();
+        setTimeout(() => {setElementSize()}, 300)
     })
-
 }
 
 function getSizes() {
-    const kubeSelectionHeight = window.innerHeight / 7;
-    const boardHeight = window.innerHeight - kubeSelectionHeight;
+    const kubeSelectionHeight = (window.innerHeight - 1) / 7;
+    const boardHeight = (window.innerHeight - 1) - kubeSelectionHeight;
+    const kubeSelectionPadding = kubeSelectionHeight * 0.15;
+    const kubeImageHeight = kubeSelectionHeight - kubeSelectionPadding * 2;
 
     return {
         kubeSelectionHeight,
+        kubeSelectionPadding,
+        kubeImageHeight,
         boardHeight
     }
 }
 
 function setElementSize() {
 
-    const { kubeSelectionHeight, boardHeight } = { ...getSizes() };
+    const { 
+        kubeSelectionHeight, 
+        kubeSelectionPadding, 
+        kubeImageHeight, 
+        boardHeight 
+    } = { ...getSizes() };
+
+    setKubeSelectable();
 
     let $kubeSelector = $("#kube-selector");
     $kubeSelector.height(kubeSelectionHeight);
-    $kubeSelector.width(window.innerWidth / 2);
-    $kubeSelector.css('top', window.innerHeight - $kubeSelector.height());
+    $kubeSelector.width(window.innerWidth);
+    $kubeSelector.css('top', (window.innerHeight - 1) - $kubeSelector.height());
 
     let $kubeContainer = $(".kube-container");
     $kubeContainer.height(kubeSelectionHeight);
     
-    let $kubeImage = $(".kube-container img");
-    $kubeImage.width(kubeSelectionHeight);
-    $kubeImage.height(kubeSelectionHeight);
+    let $kubeImg = $(".kube-image");
+    $kubeImg.css("padding-top", kubeSelectionPadding + "px");
+    $kubeImg.css("padding-bottom", kubeSelectionPadding + "px");
+    $kubeImg.css("padding-right", kubeSelectionPadding/1.5 + "px");
+    $kubeImg.css("padding-left", kubeSelectionPadding/1.5 + "px");
+
+    let $img = $(".kube-container img");
+    $img.width(kubeImageHeight);
+    $img.height(kubeImageHeight);
 
     renderer.setSize(window.innerWidth,boardHeight);
     camera.aspect = window.innerWidth / boardHeight;
     camera.updateProjectionMatrix();
+}
+
+function getKubeImage(kubeType, player) {
+    switch(kubeType) {
+        case KUBE_TYPE.STAR:
+            return "kube_star" + player + ".png";
+        case KUBE_TYPE.COMET:
+            return "kube_comet" + player + ".png";
+        case KUBE_TYPE.EARTHQUAKE:
+            return "kube_earthquake" + player + ".png";
+        case KUBE_TYPE.TSUNAMI:
+            return "kube_tsunami" + player + ".png";
+        case KUBE_TYPE.TORNADO:
+            return "kube_tornado" + player + ".png";
+        case KUBE_TYPE.FIRE:
+            return "kube_fire" + player + ".png";
+        case KUBE_TYPE.ECLIPSE:
+            return "kube_eclipse" + player + ".png";
+        case KUBE_TYPE.SHIELD:
+            return "kube_shield" + player + ".png";
+        case KUBE_TYPE.KEY:
+            return "kube_key" + player + ".png";
+        case KUBE_TYPE.EYE:
+            return "kube_eye" + player + ".png";
+    }
+
+}
+
+function setKubeSelectable() {
+    const { 
+        kubeSelectionHeight, 
+    } = { ...getSizes() };
+
+    const $kubeSlider = $("#kube-slider");
+    $kubeSlider.html("");
+
+    for(const selectableKube of selectableKubes) {
+        const $img = $("<img/>").attr("src", "./img/" + getKubeImage(selectableKube, currentPlayer));
+        const $kubeImg = $("<div/>").addClass("kube-image");
+        const $kubeContainer = $("<div/>").addClass("kube-container");
+        const $li = $("<li/>");
+
+        $img.attr("kube-type", selectableKube);
+
+        $img.on(
+            'mousedown',
+            function(e){
+                if(e.which!=1) {
+                    return;
+                }
+                $(e.target).attr("click-x", e.pageX)
+                $(e.target).attr("click-y", e.pageY)
+            }
+        );
+
+        $img.on(
+            'mouseup',
+            function(e){
+                if(e.which!=1) {
+                    return;
+                }
+                if($(e.target).attr("click-x") == e.pageX && 
+                    $(e.target).attr("click-y") == e.pageY) {
+                        $kubeContainer.toggleClass("kube-slider-selected");
+                }
+            }
+        );
+    
+        $kubeImg.append($img);
+        $kubeContainer.append($kubeImg);
+        $li.append($kubeContainer);
+    
+        $kubeSlider.append($li);
+    }
+
+    $('#kube-slider').lightSlider(
+        {
+            pager:false,
+            item: window.innerWidth / kubeSelectionHeight,
+        }
+    );
 }
 
 function initOrbitControl() {
@@ -204,13 +339,7 @@ function initKube(kubeType, x, y, player) {
     }
 
 
-    switch(kubeType) {
-        case KUBE_TYPE.STAR:
-            kubeImage = 'kube_star.png';
-            break;
-    }
-
-    kubeImage = + '/img/' + kubeImage;
+    kubeImage = '/img/' + getKubeImage(kubeType, player);
   
     geometry = new THREE.BoxGeometry(KUBE_SIZE, KUBE_SIZE , KUBE_SIZE);
     cubeMaterial = [
